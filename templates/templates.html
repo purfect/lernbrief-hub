@@ -4,21 +4,7 @@
 <section class="panel">
     <h2>Satzbausteine nach Note</h2>
     <p>Hinweis: Mit <strong>{name}</strong> kann der Schülername im Satz verwendet werden.</p>
-</section>
-
-<section class="panel">
-    <h3>Abschlusssatz (optional)</h3>
-    <p>Der Satz zum Notendurchschnitt kann deaktiviert oder individuell formuliert werden.</p>
-    <form method="post" class="grid-form">
-        <input type="hidden" name="action" value="update_average_sentence">
-        <label>
-            <input type="checkbox" name="include_average_sentence" {% if include_average_sentence %}checked{% endif %}>
-            Satz mit Durchschnitt im Lernbrief anzeigen
-        </label>
-        <textarea name="average_sentence_template" rows="3" required>{{ average_sentence_template }}</textarea>
-        <p>Platzhalter: <strong>{name}</strong>, <strong>{avg_grade}</strong>, <strong>{avg_text}</strong>, <strong>{semester}</strong></p>
-        <button type="submit">Einstellung speichern</button>
-    </form>
+    <a class="button-link" href="{{ url_for('letter_templates_editor') }}">Zu den Lernbriefvorlagen</a>
 </section>
 
 <section class="panel">

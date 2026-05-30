@@ -10,6 +10,27 @@
 </section>
 
 <section class="panel">
+    <h3>Halbjahrestext der Lerngruppe</h3>
+    <p>Dieser Einführungstext wird im Lernbrief aller Schüler dieser Lerngruppe für das ausgewählte Halbjahr unterhalb des Headers eingefügt.</p>
+
+    <form method="get" class="inline-form">
+        <label for="semester">Halbjahr:</label>
+        <select id="semester" name="semester" required>
+            {% for option in semester_options %}
+                <option value="{{ option }}" {% if option == semester %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Laden</button>
+    </form>
+
+    <form method="post" action="{{ url_for('save_group_semester_text', group_id=group.id) }}" class="grid-form">
+        <input type="hidden" name="semester" value="{{ semester }}">
+        <textarea name="semester_intro_text" class="semester-textarea" rows="4" placeholder="Optional">{{ semester_intro_text }}</textarea>
+        <button type="submit">Halbjahrestext speichern</button>
+    </form>
+</section>
+
+<section class="panel">
     <h3>Schülerliste ({{ students|length }})</h3>
     <table>
         <thead>

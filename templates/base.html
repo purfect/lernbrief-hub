@@ -7,13 +7,27 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    {% set ep = request.endpoint %}
     <header class="topbar">
-        <h1>Lernbrief-Hub</h1>
-        <nav>
-            <a href="{{ url_for('new_group') }}">Lerngruppe anlegen</a>
-            <a href="{{ url_for('index') }}">Dashboard</a>
-            <a href="{{ url_for('competencies') }}">Kompetenzen</a>
-            <a href="{{ url_for('templates_editor') }}">Satzbausteine</a>
+        <div class="topbar-main">
+            <h1>Lernbrief-Hub</h1>
+        </div>
+
+        <nav class="topnav" aria-label="Hauptnavigation">
+            <div class="nav-group">
+                <span class="nav-group-title">Arbeitsbereich</span>
+                <a class="nav-pill {% if ep == 'overview' %}active{% endif %}" href="{{ url_for('overview') }}">Übersicht</a>
+                <a class="nav-pill {% if ep == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Dashboard</a>
+            </div>
+
+            <div class="nav-group">
+                <span class="nav-group-title">Verwaltung</span>
+                <a class="nav-pill {% if ep == 'new_group' %}active{% endif %}" href="{{ url_for('new_group') }}">Lerngruppe anlegen</a>
+                <a class="nav-pill {% if ep == 'competencies' %}active{% endif %}" href="{{ url_for('competencies') }}">Kompetenzen</a>
+                <a class="nav-pill {% if ep == 'templates_editor' %}active{% endif %}" href="{{ url_for('templates_editor') }}">Satzbausteine</a>
+                <a class="nav-pill {% if ep == 'letter_templates_editor' %}active{% endif %}" href="{{ url_for('letter_templates_editor') }}">Lernbriefvorlagen</a>
+                <a class="nav-pill {% if ep == 'data_management' %}active{% endif %}" href="{{ url_for('data_management') }}">Daten & Archiv</a>
+            </div>
         </nav>
     </header>
 

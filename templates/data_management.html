@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Daten & Archiv</h2>
+    <p>Abgeschlossene Halbjahre archivieren und Datenbank-Backup mit einem Klick sichern oder wiederherstellen.</p>
+</section>
+
+<section class="panel">
+    <h3>Archivmodus für Halbjahre</h3>
+    <p>Archivierte Halbjahre bleiben lesbar, sind aber in der Bewertung schreibgeschuetzt.</p>
+    <p>Aktuell archiviert: <strong>{{ archived_count }}</strong></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Halbjahr</th>
+                <th>Bewertungen</th>
+                <th>Lernbriefe</th>
+                <th>Status</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in semester_items %}
+                <tr>
+                    <td>{{ row.semester }}</td>
+                    <td>{{ row.rating_count }}</td>
+                    <td>{{ row.letter_count }}</td>
+                    <td>
+                        {% if row.archived %}
+                            <span class="status-pill status-archived">Archiviert</span>
+                        {% else %}
+                            <span class="status-pill status-active">Aktiv</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('toggle_archive_semester') }}">
+                            <input type="hidden" name="semester" value="{{ row.semester }}">
+                            {% if row.archived %}
+                                <input type="hidden" name="action" value="unarchive">
+                                <button type="submit">Reaktivieren</button>
+                            {% else %}
+                                <input type="hidden" name="action" value="archive">
+                                <button type="submit">Archivieren</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5">Noch keine Halbjahresdaten vorhanden.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="panel data-actions-grid">
+    <article class="data-action-card">
+        <h3>Backup erstellen</h3>
+        <p>Datei: {{ db_file_name }} (ca. {{ db_size_kb }} KB)</p>
+        <a class="button-link" href="{{ url_for('download_backup') }}">Backup herunterladen</a>
+    </article>
+
+    <article class="data-action-card">
+        <h3>Backup wiederherstellen</h3>
+        <p>Wiederherstellung ersetzt die aktuelle Datenbank. Vorher wird automatisch eine Sicherungskopie angelegt.</p>
+        <form method="post" action="{{ url_for('restore_backup') }}" enctype="multipart/form-data" class="grid-form">
+            <input type="file" name="backup_file" accept=".db,.sqlite,.sqlite3" required>
+            <button type="submit">Wiederherstellen</button>
+        </form>
+    </article>
+</section>
+{% endblock %}
