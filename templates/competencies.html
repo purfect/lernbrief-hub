@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Kompetenzen verwalten</h2>
+    <form method="post" class="grid-form">
+        <input type="hidden" name="action" value="create">
+        <input type="text" name="name" placeholder="Kompetenzname" required>
+        <input type="text" name="description" placeholder="Beschreibung">
+        <input type="number" name="sort_order" placeholder="Sortierung" value="0">
+        <button type="submit">Kompetenz anlegen</button>
+    </form>
+</section>
+
+<section class="panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Reihenfolge</th>
+                <th>Name</th>
+                <th>Beschreibung</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in competencies %}
+                <tr>
+                    <td>
+                        <input type="number" name="sort_order" value="{{ c.sort_order }}" form="update_comp_{{ c.id }}" required>
+                    </td>
+                    <td>
+                        <input type="text" name="name" value="{{ c.name }}" form="update_comp_{{ c.id }}" required>
+                    </td>
+                    <td>
+                        <input type="text" name="description" value="{{ c.description }}" form="update_comp_{{ c.id }}">
+                    </td>
+                    <td>
+                        <form method="post" id="update_comp_{{ c.id }}">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="competency_id" value="{{ c.id }}">
+                            <button type="submit">Speichern</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Keine Kompetenzen angelegt.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

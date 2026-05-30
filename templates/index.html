@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Schülersuche</h2>
+    <form method="get" class="inline-form">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Name oder Lerngruppe suchen" required>
+        <button type="submit">Suchen</button>
+        {% if search_query %}
+            <a class="button-link" href="{{ url_for('index') }}">Zurücksetzen</a>
+        {% endif %}
+    </form>
+
+    {% if search_query %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Schüler</th>
+                    <th>Lerngruppe</th>
+                    <th>Bewertung</th>
+                    <th>Schülerakte</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in student_results %}
+                    <tr>
+                        <td>{{ s.full_name }}</td>
+                        <td>{{ s.group_name }}</td>
+                        <td><a class="button-link" href="{{ url_for('ratings', student_id=s.student_id, semester=default_semester) }}">Öffnen</a></td>
+                        <td><a class="button-link" href="{{ url_for('ratings', student_id=s.student_id, semester=default_semester) }}#student-record">Anzeigen</a></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">Keine Schüler zur Suche gefunden.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Lerngruppen</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Gruppe</th>
+                <th>Anzahl Schüler</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+                <tr>
+                    <td>{{ group.name }}</td>
+                    <td>{{ group.student_count }}</td>
+                    <td><a class="button-link" href="{{ url_for('group_detail', group_id=group.id) }}">Öffnen</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">Noch keine Lerngruppe vorhanden.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="panel">
+    <h2>Zuletzt erzeugte Lernbriefe</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Schüler</th>
+                <th>Halbjahr</th>
+                <th>Erstellt am</th>
+                <th>Aktion</th>
+                <th>PDF</th>
+                <th>Word</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for letter in recent_letters %}
+                <tr>
+                    <td>{{ letter.full_name }}</td>
+                    <td>{{ letter.semester }}</td>
+                    <td>{{ letter.created_at }}</td>
+                    <td><a class="button-link" href="{{ url_for('letter_detail', letter_id=letter.id) }}">Anzeigen</a></td>
+                    <td><a class="button-link" href="{{ url_for('export_letter_pdf', letter_id=letter.id) }}">Export</a></td>
+                    <td><a class="button-link" href="{{ url_for('export_letter_docx', letter_id=letter.id) }}">Export</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">Noch keine Lernbriefe erzeugt.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

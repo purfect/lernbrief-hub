@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Lernbrief: {{ letter.full_name }}</h2>
+    <p>Halbjahr: {{ letter.semester }} | Erstellt am: {{ letter.created_at }}</p>
+    <div class="inline-form">
+        <a class="button-link" href="{{ url_for('export_letter_pdf', letter_id=letter.id) }}">Als PDF exportieren</a>
+        <a class="button-link" href="{{ url_for('export_letter_docx', letter_id=letter.id) }}">Als Word exportieren</a>
+    </div>
+    <form method="post" action="{{ url_for('delete_letter', letter_id=letter.id) }}" class="inline-form">
+        <input type="hidden" name="next" value="ratings">
+        <button type="submit">Lernbrief löschen</button>
+    </form>
+    <pre class="letter-output">{{ letter.content }}</pre>
+</section>
+{% endblock %}
