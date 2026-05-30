@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Lernbriefvorlagen</h2>
+    <p>Hier bearbeitest du komplette Lernbriefvorlagen mit Layout und Textstil. Platzhalter werden beim Generieren automatisch ersetzt.</p>
+
+    <form method="post" class="inline-form">
+        <input type="hidden" name="action" value="create">
+        <input type="text" name="new_template_name" placeholder="Neue Vorlagenbezeichnung" required>
+        <button type="submit">Vorlage anlegen</button>
+    </form>
+</section>
+
+{% if selected_template %}
+<section class="panel">
+    <div class="template-tabs" role="tablist" aria-label="Lernbriefvorlagen">
+        {% for tpl in templates %}
+            <a
+                class="template-tab {% if tpl.id == selected_template.id %}active{% endif %}"
+                href="{{ url_for('letter_templates_editor', template_id=tpl.id) }}"
+            >
+                {{ tpl.name }}{% if tpl.is_active %} (aktiv){% endif %}
+            </a>
+        {% endfor %}
+    </div>
+
+    <form method="post" class="template-config-form">
+        <input type="hidden" name="template_id" value="{{ selected_template.id }}">
+
+        <div class="inline-form">
+            <input type="text" name="name" value="{{ selected_template.name }}" required>
+            <button type="submit" name="action" value="save">Vorlage speichern</button>
+            <button type="submit" name="action" value="activate">Als aktiv setzen</button>
+            <button type="submit" name="action" value="delete" onclick="return confirm('Diese Vorlage wirklich löschen?')">Löschen</button>
+        </div>
+
+        <div class="template-config-grid">
+            <article class="template-card">
+                <h4>Header</h4>
+                <p class="template-help">Position und Inhalt des Kopfbereichs.</p>
+                <label>Header-Position</label>
+                <select name="header_position">
+                    <option value="top" {% if selected_template.header_position == 'top' %}selected{% endif %}>Ganz oben</option>
+                    <option value="after_intro" {% if selected_template.header_position == 'after_intro' %}selected{% endif %}>Nach Einleitung</option>
+                </select>
+
+                <div class="rich-editor" data-editor="header_html">
+                    <div class="rich-toolbar">
+                        <button type="button" data-cmd="bold">Fett</button>
+                        <button type="button" data-cmd="italic">Kursiv</button>
+                        <button type="button" data-cmd="underline">Unterstrichen</button>
+                        <select data-cmd="fontName">
+                            <option value="Arial">Arial</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Verdana">Verdana</option>
+                        </select>
+                        <select data-cmd="fontSize">
+                            <option value="2">Klein</option>
+                            <option value="3" selected>Normal</option>
+                            <option value="4">Groß</option>
+                            <option value="5">Sehr groß</option>
+                        </select>
+                    </div>
+                    <div class="rich-content" contenteditable="true">{{ selected_template.header_html|safe }}</div>
+                    <input type="hidden" name="header_html">
+                </div>
+
+                <div class="placeholder-chips">
+                    <span>{name}</span><span>{full_name}</span><span>{group_name}</span><span>{semester}</span><span>{avg_grade}</span><span>{avg_text}</span>
+                </div>
+                <div class="placeholder-help-list">
+                    <p><strong>{name}</strong>: Vorname/Nachname des Schülers</p>
+                    <p><strong>{group_name}</strong>: Name der Lerngruppe</p>
+                    <p><strong>{semester}</strong>: Gewähltes Schulhalbjahr</p>
+                </div>
+            </article>
+
+            <article class="template-card">
+                <h4>Footer</h4>
+                <p class="template-help">Abschlussbereich und optionaler Durchschnittssatz.</p>
+                <label>Footer-Position</label>
+                <select name="footer_position">
+                    <option value="bottom" {% if selected_template.footer_position == 'bottom' %}selected{% endif %}>Am Ende</option>
+                    <option value="after_header" {% if selected_template.footer_position == 'after_header' %}selected{% endif %}>Direkt nach Header</option>
+                </select>
+
+                <label class="toggle-row">
+                    <input type="checkbox" name="include_average_sentence" {% if selected_template.include_average_sentence %}checked{% endif %}>
+                    Satz mit Durchschnitt anzeigen
+                </label>
+                <label>Durchschnittssatz</label>
+                <textarea name="average_sentence_template" rows="3" required>{{ selected_template.average_sentence_template }}</textarea>
+
+                <div class="rich-editor" data-editor="footer_html">
+                    <div class="rich-toolbar">
+                        <button type="button" data-cmd="bold">Fett</button>
+                        <button type="button" data-cmd="italic">Kursiv</button>
+                        <button type="button" data-cmd="underline">Unterstrichen</button>
+                        <select data-cmd="fontName">
+                            <option value="Arial">Arial</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Verdana">Verdana</option>
+                        </select>
+                    </div>
+                    <div class="rich-content" contenteditable="true">{{ selected_template.footer_html|safe }}</div>
+                    <input type="hidden" name="footer_html">
+                </div>
+            </article>
+        </div>
+
+        <section class="panel template-layout-panel">
+            <h4>Einheitlicher Textstil für Satzbausteine</h4>
+            <div class="inline-form">
+                <label for="body_font_family">Schriftart</label>
+                <select id="body_font_family" name="body_font_family">
+                    <option value="Arial" {% if selected_template.body_font_family == 'Arial' %}selected{% endif %}>Arial</option>
+                    <option value="Georgia" {% if selected_template.body_font_family == 'Georgia' %}selected{% endif %}>Georgia</option>
+                    <option value="Times New Roman" {% if selected_template.body_font_family == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
+                    <option value="Verdana" {% if selected_template.body_font_family == 'Verdana' %}selected{% endif %}>Verdana</option>
+                    <option value="Calibri" {% if selected_template.body_font_family == 'Calibri' %}selected{% endif %}>Calibri</option>
+                </select>
+                <label for="body_font_size">Schriftgröße</label>
+                <input id="body_font_size" type="number" name="body_font_size" min="4" max="28" value="{{ selected_template.body_font_size }}">
+            </div>
+        </section>
+    </form>
+</section>
+{% endif %}
+
+<script src="{{ url_for('static', filename='rich_editor.js') }}"></script>
+{% endblock %}

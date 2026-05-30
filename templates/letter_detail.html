@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Lernbrief: {{ letter.full_name }}</h2>
+    <p>Halbjahr: {{ letter.semester }} | Erstellt am: {{ letter.created_at }}</p>
+    <p>Vorlage: {{ letter.template_name or 'Standard' }}</p>
+    <div class="inline-form">
+        <a class="button-link" href="{{ url_for('export_letter_pdf', letter_id=letter.id) }}">Als PDF exportieren</a>
+        <a class="button-link" href="{{ url_for('export_letter_docx', letter_id=letter.id) }}">Als Word exportieren</a>
+    </div>
+    <form method="post" action="{{ url_for('update_letter', letter_id=letter.id) }}" class="grid-form" data-letter-editor>
+        <label>Lernbriefinhalt bearbeiten</label>
+        <div class="rich-toolbar">
+            <button type="button" data-cmd="bold">Fett</button>
+            <button type="button" data-cmd="italic">Kursiv</button>
+            <button type="button" data-cmd="underline">Unterstrichen</button>
+            <select data-cmd="fontName">
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+            <select data-cmd="fontSize">
+                <option value="2">Klein</option>
+                <option value="3" selected>Normal</option>
+                <option value="4">Groß</option>
+                <option value="5">Sehr groß</option>
+            </select>
+        </div>
+        <div class="rich-content letter-edit-content" contenteditable="true">{{ letter.content|replace('\n', '<br>')|safe }}</div>
+        <input type="hidden" name="content_html">
+        <button type="submit">Änderungen speichern</button>
+    </form>
+    <form method="post" action="{{ url_for('delete_letter', letter_id=letter.id) }}" class="inline-form">
+        <input type="hidden" name="next" value="ratings">
+        <button type="submit">Lernbrief löschen</button>
+    </form>
+</section>
+<script src="{{ url_for('static', filename='rich_editor.js') }}"></script>
+{% endblock %}

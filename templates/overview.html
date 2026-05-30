@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel overview-hero">
+    <div>
+        <h2>Gesamtübersicht</h2>
+        <p>Wichtige Kennzahlen, aktuelle Aktivität und ein schneller Blick auf die Nutzung des Lernbrief-Hub.</p>
+    </div>
+    <div class="overview-badge">Aktuelles Halbjahr: {{ default_semester }}</div>
+</section>
+
+<section class="overview-stats">
+    <article class="stat-card accent-teal">
+        <span class="stat-label">Schüler</span>
+        <strong class="stat-value">{{ summary.student_count }}</strong>
+        <p>{{ summary.group_count }} Lerngruppen insgesamt</p>
+    </article>
+    <article class="stat-card accent-blue">
+        <span class="stat-label">Lernbriefe</span>
+        <strong class="stat-value">{{ summary.letter_count }}</strong>
+        <p>{{ summary.letter_student_count }} Schüler mit gespeicherten Briefen</p>
+    </article>
+    <article class="stat-card accent-gold">
+        <span class="stat-label">Bewertungen</span>
+        <strong class="stat-value">{{ summary.rating_count }}</strong>
+        <p>{{ summary.rated_student_count }} Schüler bereits bewertet</p>
+    </article>
+    <article class="stat-card accent-slate">
+        <span class="stat-label">Kompetenzen</span>
+        <strong class="stat-value">{{ summary.competency_count }}</strong>
+        <p>Aktiv im Bewertungssystem hinterlegt</p>
+    </article>
+</section>
+
+<section class="overview-grid">
+    <section class="panel">
+        <h3>Aktuelles Halbjahr</h3>
+        <div class="overview-kpis">
+            <div>
+                <span class="mini-kpi-label">Bewertungen</span>
+                <strong>{{ summary.current_semester_rating_count }}</strong>
+            </div>
+            <div>
+                <span class="mini-kpi-label">Lernbriefe</span>
+                <strong>{{ summary.current_semester_letter_count }}</strong>
+            </div>
+            <div>
+                <span class="mini-kpi-label">Bewertete Halbjahre</span>
+                <strong>{{ summary.rating_semester_count }}</strong>
+            </div>
+            <div>
+                <span class="mini-kpi-label">Brief-Halbjahre</span>
+                <strong>{{ summary.letter_semester_count }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h3>Größte Lerngruppen</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Lerngruppe</th>
+                    <th>Schüler</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in largest_groups %}
+                    <tr>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.student_count }}</td>
+                        <td><a class="button-link" href="{{ url_for('group_detail', group_id=group.id) }}">Öffnen</a></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Noch keine Lerngruppen vorhanden.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <h3>Aktivität nach Halbjahr</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Halbjahr</th>
+                    <th>Bewertungen</th>
+                    <th>Lernbriefe</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in semester_activity %}
+                    <tr>
+                        <td>{{ row.semester }}</td>
+                        <td>{{ row.rating_count }}</td>
+                        <td>{{ row.letter_count }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Noch keine Halbjahresaktivität vorhanden.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <h3>Zuletzt gespeicherte Lernbriefe</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Schüler</th>
+                    <th>Halbjahr</th>
+                    <th>Erstellt am</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for letter in recent_letters %}
+                    <tr>
+                        <td>{{ letter.full_name }}</td>
+                        <td>{{ letter.semester }}</td>
+                        <td>{{ letter.created_at }}</td>
+                        <td><a class="button-link" href="{{ url_for('letter_detail', letter_id=letter.id) }}">Anzeigen</a></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">Noch keine Lernbriefe gespeichert.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</section>
+
+{% endblock %}

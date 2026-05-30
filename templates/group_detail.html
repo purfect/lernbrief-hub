@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Lerngruppe: {{ group.name }}</h2>
+    <form action="{{ url_for('create_student', group_id=group.id) }}" method="post" class="inline-form">
+        <input type="text" name="full_name" placeholder="Schülername" required>
+        <button type="submit">Schüler hinzufügen</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h3>Halbjahrestext der Lerngruppe</h3>
+    <p>Dieser Einführungstext wird im Lernbrief aller Schüler dieser Lerngruppe für das ausgewählte Halbjahr unterhalb des Headers eingefügt.</p>
+
+    <form method="get" class="inline-form">
+        <label for="semester">Halbjahr:</label>
+        <select id="semester" name="semester" required>
+            {% for option in semester_options %}
+                <option value="{{ option }}" {% if option == semester %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Laden</button>
+    </form>
+
+    <form method="post" action="{{ url_for('save_group_semester_text', group_id=group.id) }}" class="grid-form">
+        <input type="hidden" name="semester" value="{{ semester }}">
+        <textarea name="semester_intro_text" class="semester-textarea" rows="4" placeholder="Optional">{{ semester_intro_text }}</textarea>
+        <button type="submit">Halbjahrestext speichern</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h3>Schülerliste ({{ students|length }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Bewertung</th>
+                <th>Schülerakte</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td>
+                        <a class="button-link" href="{{ url_for('ratings', student_id=student.id, semester=default_semester) }}">
+                            Öffnen
+                        </a>
+                    </td>
+                    <td>
+                        <a class="button-link" href="{{ url_for('ratings', student_id=student.id, semester=default_semester) }}#student-record">
+                            Anzeigen
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">Noch keine Schüler in dieser Gruppe.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

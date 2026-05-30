@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lernbrief-Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% set ep = request.endpoint %}
+    <header class="topbar">
+        <div class="topbar-main">
+            <h1>Lernbrief-Hub</h1>
+        </div>
+
+        <nav class="topnav" aria-label="Hauptnavigation">
+            <div class="nav-group">
+                <span class="nav-group-title">Arbeitsbereich</span>
+                <a class="nav-pill {% if ep == 'overview' %}active{% endif %}" href="{{ url_for('overview') }}">Übersicht</a>
+                <a class="nav-pill {% if ep == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Dashboard</a>
+            </div>
+
+            <div class="nav-group">
+                <span class="nav-group-title">Verwaltung</span>
+                <a class="nav-pill {% if ep == 'new_group' %}active{% endif %}" href="{{ url_for('new_group') }}">Lerngruppe anlegen</a>
+                <a class="nav-pill {% if ep == 'competencies' %}active{% endif %}" href="{{ url_for('competencies') }}">Kompetenzen</a>
+                <a class="nav-pill {% if ep == 'templates_editor' %}active{% endif %}" href="{{ url_for('templates_editor') }}">Satzbausteine</a>
+                <a class="nav-pill {% if ep == 'letter_templates_editor' %}active{% endif %}" href="{{ url_for('letter_templates_editor') }}">Lernbriefvorlagen</a>
+                <a class="nav-pill {% if ep == 'data_management' %}active{% endif %}" href="{{ url_for('data_management') }}">Daten & Archiv</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section class="messages">
+                    {% for category, message in messages %}
+                        <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

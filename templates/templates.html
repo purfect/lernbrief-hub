@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Satzbausteine nach Note</h2>
+    <p>Hinweis: Mit <strong>{name}</strong> kann der Schülername im Satz verwendet werden.</p>
+    <a class="button-link" href="{{ url_for('letter_templates_editor') }}">Zu den Lernbriefvorlagen</a>
+</section>
+
+<section class="panel">
+    <h3>Neuen Satzbaustein hinzufügen</h3>
+    <form method="post" class="grid-form">
+        <input type="hidden" name="action" value="create">
+        <select name="competency_id" required>
+            <option value="">Kompetenz wählen</option>
+            {% for comp in competencies %}
+                <option value="{{ comp.id }}">{{ comp.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="grade" required>
+            <option value="">Note</option>
+            {% for grade in grade_options %}
+                <option value="{{ grade }}">{{ grade }}</option>
+            {% endfor %}
+        </select>
+        <textarea name="sentence" rows="2" placeholder="Satzbaustein" required></textarea>
+        <button type="submit">Hinzufügen</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h3>Bestehende Satzbausteine</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kompetenz</th>
+                <th>Note</th>
+                <th>Satz</th>
+                <th>Speichern</th>
+                <th>Löschen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in templates %}
+                <tr>
+                    <td>{{ row.competency_name }}</td>
+                    <td>{{ row.grade }}</td>
+                    <td>
+                        <form method="post" class="inline-row-form">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="template_id" value="{{ row.id }}">
+                            <textarea name="sentence" rows="2" required>{{ row.sentence }}</textarea>
+                    </td>
+                    <td>
+                            <button type="submit">Speichern</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="template_id" value="{{ row.id }}">
+                            <button type="submit">Löschen</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5">Noch keine Satzbausteine vorhanden.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

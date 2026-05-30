@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="panel">
+    <h2>Bewertung: {{ student.full_name }}</h2>
+    <p>Lerngruppe: {{ student.group_name }}</p>
+    <p>Halbjahr wird aus einer gültigen Schulhalbjahresliste gewählt.</p>
+
+    <form method="get" class="inline-form">
+        <label for="semester">Halbjahr:</label>
+        <select id="semester" name="semester" required>
+            {% for option in semester_options %}
+                <option value="{{ option }}" {% if option == semester %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Laden</button>
+    </form>
+
+    <form method="post">
+        <input type="hidden" name="action" value="save_ratings">
+        <input type="hidden" name="semester" value="{{ semester }}">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Kompetenz</th>
+                    <th>Note</th>
+                    <th>Zusatz / Beobachtung</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comp in competencies %}
+                    {% set r = ratings_map.get(comp.id) %}
+                    <tr>
+                        <td>{{ comp.name }}</td>
+                        <td>
+                            <select name="grade_{{ comp.id }}" required>
+                                <option value="">-</option>
+                                {% for grade in grade_options %}
+                                    <option value="{{ grade }}" {% if r and r.grade == grade %}selected{% endif %}>{{ grade }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <textarea name="note_{{ comp.id }}" class="rating-note" rows="2" placeholder="Optional">{{ r.note if r else '' }}</textarea>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit">Bewertungen speichern</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h3>Halbjahresziele (Schüler)</h3>
+    <p>Dieses Ziel gilt nur für {{ student.full_name }} im gewählten Halbjahr.</p>
+    <form method="post" class="grid-form">
+        <input type="hidden" name="action" value="save_student_goal">
+        <input type="hidden" name="semester" value="{{ semester }}">
+
+        <label for="semester_goal_text">Halbjahresziele für {{ student.full_name }}</label>
+        <textarea id="semester_goal_text" name="semester_goal_text" class="semester-textarea" rows="4" placeholder="Optional">{{ semester_goal_text }}</textarea>
+
+        <button type="submit">Halbjahresziel speichern</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h3>Lernbrief erzeugen</h3>
+    <form method="post" action="{{ url_for('generate_letter', student_id=student.id) }}" class="inline-form">
+        <input type="hidden" name="semester" value="{{ semester }}">
+        <button type="submit">Lernbrief für dieses Halbjahr generieren</button>
+    </form>
+
+    <h4>Bereits gespeicherte Lernbriefe</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Halbjahr</th>
+                <th>Erstellt am</th>
+                <th>Anzeigen</th>
+                <th>PDF</th>
+                <th>Word</th>
+                <th>Löschen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for letter in letters %}
+                <tr>
+                    <td>{{ letter.semester }}</td>
+                    <td>{{ letter.created_at }}</td>
+                    <td><a class="button-link" href="{{ url_for('letter_detail', letter_id=letter.id) }}">Anzeigen</a></td>
+                    <td><a class="button-link" href="{{ url_for('export_letter_pdf', letter_id=letter.id) }}">Export</a></td>
+                    <td><a class="button-link" href="{{ url_for('export_letter_docx', letter_id=letter.id) }}">Export</a></td>
+                    <td>
+                        <form method="post" action="{{ url_for('delete_letter', letter_id=letter.id) }}">
+                            <input type="hidden" name="next" value="ratings">
+                            <button type="submit">Löschen</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">Noch keine Lernbriefe vorhanden.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="panel" id="student-record">
+    <h3>Bisherige Bewertungen (alle Halbjahre)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Halbjahr</th>
+                <th>Kompetenz</th>
+                <th>Note</th>
+                <th>Zusatz</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rating_history %}
+                <tr>
+                    <td>{{ row.semester }}</td>
+                    <td>{{ row.competency_name }}</td>
+                    <td>{{ row.grade }}</td>
+                    <td>{{ row.note or '-' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Noch keine bisherigen Bewertungen vorhanden.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="panel">
+    <h3>Kompetenzentwicklung über Halbjahre</h3>
+    {% if trend_semesters %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Kompetenz</th>
+                    <th>Verlauf</th>
+                    <th>Letzte Note</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in competency_trends %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>
+                            <div class="trend-track">
+                                {% for point in row.points %}
+                                    <div class="trend-point">
+                                        <span class="trend-semester">{{ point.semester }}</span>
+                                        <div class="trend-bar-bg">
+                                            <div class="trend-bar {{ point.grade_class }}" style="height: {{ point.score_percent }}%;"></div>
+                                        </div>
+                                        <span class="trend-grade">{% if point.grade is not none %}{{ point.grade }}{% else %}-{% endif %}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>{% if row.latest_grade is not none %}{{ row.latest_grade }}{% else %}-{% endif %}</td>
+                        <td><span class="trend-pill {{ row.trend_class }}">{{ row.delta_text }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Fuer diese Schuelerakte sind noch keine Halbjahresverlaeufe vorhanden.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h3>Halbjahresübersicht</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Halbjahr</th>
+                <th>Durchschnitt</th>
+                <th>Anzahl Bewertungen</th>
+                <th>Anzahl Lernbriefe</th>
+                <th>Letzter Lernbrief</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in semester_overview %}
+                <tr>
+                    <td>{{ row.semester }}</td>
+                    <td>{{ row.avg_grade }}</td>
+                    <td>{{ row.rating_count }}</td>
+                    <td>{{ row.letter_count }}</td>
+                    <td>{{ row.last_letter_created_at }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5">Noch keine Halbjahresdaten vorhanden.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
