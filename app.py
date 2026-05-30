@@ -307,11 +307,15 @@ def normalize_inline_template_html(raw_html: str) -> str:
     if not html:
         return ""
     # Rich editors often wrap inline text into p/div blocks.
-    # Convert block boundaries to single line breaks and keep the rest inline.
+    # Convert only block boundaries to single breaks and keep text/inline tags untouched.
+    html = html.replace("\r\n", "\n").replace("\r", "\n")
+    html = re.sub(r">\s+<", "><", html)
     html = re.sub(r"(?i)<\s*p\b[^>]*>", "", html)
     html = re.sub(r"(?i)<\s*div\b[^>]*>", "", html)
     html = re.sub(r"(?i)<\s*/\s*p\s*>", "<br>", html)
     html = re.sub(r"(?i)<\s*/\s*div\s*>", "<br>", html)
+    html = html.replace("\n", "<br>")
+    html = re.sub(r"(?i)\s*<\s*br\s*/?>\s*", "<br>", html)
     html = re.sub(r"(?i)(?:<\s*br\s*/?>\s*){2,}", "<br>", html)
     html = re.sub(r"(?i)^(?:\s*<\s*br\s*/?>\s*)+", "", html)
     html = re.sub(r"(?i)(?:\s*<\s*br\s*/?>\s*)+$", "", html)
