@@ -1,5 +1,18 @@
 # Release Notes
 
+## Lernbrief-Hub v1.3.1 (30.05.2026)
+
+### Seit v1.3.0 neu
+- Notenskala systemweit auf 1 bis 5 umgestellt (statt 1 bis 6).
+- Automatischer Standard-Abschlusssatz entfernt; es wird kein Footer-Text mehr erzwungen.
+- Migration ergaenzt: alter Standard-Abschlusssatz wird aus bestehenden Vorlagen entfernt.
+- Zusaetzliches Stop-Skript als CMD-Datei hinzugefuegt (`stop_lernbrief_hub.cmd`).
+- Lokale SQLite-Datenbank aus dem Repository entfernt und Ignore-Regeln nachgeschaerft.
+
+### Kompatibilitaet
+- Keine manuelle Migration erforderlich.
+- Bestehende Bewertungen mit Note 6 bleiben als historische Daten erhalten, neue Eingaben sind auf 1 bis 5 begrenzt.
+
 ## Lernbrief-Hub v1.3.0 (30.05.2026)
 
 ### Seit v1.2.5 neu
