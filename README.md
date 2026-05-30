@@ -8,9 +8,16 @@ Lernbrief-Hub ist eine lokale Windows-Software (Web-App), um Lerngruppen, Schül
 - Globale Kompetenzen (für alle Schüler gleiche Vorgaben)
 - Bewertung pro Schüler und Kompetenz je Halbjahr (Noten 1 bis 6)
 - Mehrere bearbeitbare Satzbausteine je Kompetenz und Note
-- Automatische Lernbrief-Generierung aus Bewertungen
-- Speicherung aller erzeugten Lernbriefe beim jeweiligen Schüler
-- Export fertiger Lernbriefe als PDF und Word (.docx)
+- Eigene Lernbriefvorlagen mit Tabs: anlegen, speichern, aktiv setzen, löschen
+- Header und Footer als Rich-Text pro Vorlage bearbeitbar
+- Header- und Footer-Position je Vorlage steuerbar (z. B. Header oben oder nach Einleitung)
+- Einheitlicher Textstil pro Vorlage (Schriftart und Schriftgröße)
+- Rich-Text-Editor für erzeugte Lernbriefe (fett, kursiv, unterstrichen, Schriftart, Schriftgröße)
+- Automatische Lernbrief-Generierung aus Bewertungen mit sinnvoller Absatzstruktur
+- Speicherung aller erzeugten Lernbriefe beim jeweiligen Schüler (Historie)
+- Export fertiger Lernbriefe als PDF und Word (.docx) mit Rich-Text-Basisformatierungen
+- Verbesserte Umbruchlogik für Header/Footer und Export (keine ungewollten Zusatzleerzeilen)
+- Übersicht mit Kennzahlen, Halbjahresauswertung und zuletzt gespeicherten Lernbriefen
 
 ## Technologie
 
@@ -51,8 +58,11 @@ Hinweis: Beim Start wird der Browser automatisch geöffnet, sobald der Server be
 - Die Datei `lernbrief_hub.db` wird beim ersten Start automatisch erzeugt.
 - Standard-Kompetenzen und Standard-Satzbausteine werden einmalig automatisch angelegt.
 - Platzhalter `{name}` kann in Satzbausteinen genutzt werden, um den Schülernamen einzusetzen.
+- In Lernbriefvorlagen stehen zusätzlich Platzhalter wie `{group_name}`, `{semester}`, `{avg_grade}` und `{avg_text}` zur Verfügung.
 - Bei der Briefgenerierung wird je Kompetenz zufällig ein passender Satz zur jeweiligen Note verwendet.
 - Bewertungen und erzeugte Lernbriefe werden pro Halbjahr gespeichert und historisch angezeigt.
+- Vorlagenanpassungen gelten für neu erzeugte Lernbriefe.
+- Bereits gespeicherte Lernbriefe bleiben unverändert, bis sie neu erzeugt oder manuell bearbeitet werden.
 
 ## Betrieb ohne Python auf dem Ziel-PC (Windows)
 
@@ -76,8 +86,8 @@ Wenn auf dem Zielrechner kein Python installiert werden darf, kann die Software 
 Wichtig:
 
 - Auf dem Ziel-PC wird kein Python benötigt.
-- Die Datenbank liegt im selben Ordner wie die EXE:
-   `dist\lernbrief_hub.db`
+- Die Datenbank liegt im selben Ordner wie die gestartete EXE:
+   `lernbrief_hub.db`
 - Auch bei der EXE wird der Browser automatisch geöffnet.
 
 Optionale Umgebungsvariablen:
