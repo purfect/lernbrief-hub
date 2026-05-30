@@ -636,7 +636,7 @@ def create_app() -> Flask:
                 (
                     "Standard",
                     default_header.replace("\n", "<br>"),
-                    "Für das kommende Halbjahr werden wir den eingeschlagenen Entwicklungsweg mit {name} kontinuierlich fortsetzen.",
+                    "",
                     default_include,
                     default_average,
                     "top",
@@ -669,6 +669,16 @@ def create_app() -> Flask:
                 "UPDATE letter_templates SET header_html = ? WHERE id = ?",
                 (updated_header, tpl_row["id"]),
             )
+
+        # Migration: remove legacy default footer sentence if still present.
+        legacy_footer = (
+            "Für das kommende Halbjahr werden wir den eingeschlagenen Entwicklungsweg mit {name} "
+            "kontinuierlich fortsetzen."
+        )
+        db.execute(
+            "UPDATE letter_templates SET footer_html = '' WHERE TRIM(footer_html) = ?",
+            (legacy_footer,),
+        )
 
         db.execute("UPDATE letter_templates SET is_active = 0 WHERE id NOT IN (SELECT id FROM letter_templates WHERE is_active = 1)")
         active_count = db.execute("SELECT COUNT(*) AS c FROM letter_templates WHERE is_active = 1").fetchone()["c"]
@@ -927,10 +937,6 @@ def create_app() -> Flask:
         )
         if custom_footer.strip():
             footer_parts.append(custom_footer)
-        else:
-            footer_parts.append(
-                f"Für das kommende Halbjahr werden wir den eingeschlagenen Entwicklungsweg mit {student['full_name']} kontinuierlich fortsetzen."
-            )
 
         if semester_goals:
             footer_parts.append(f"Halbjahresziele:<br>{ensure_sentence_punctuation(semester_goals)}")
@@ -1406,7 +1412,7 @@ def create_app() -> Flask:
                         (
                             name,
                             "Lernbrief für {name}<br>Lerngruppe: {group_name}<br>Halbjahr: {semester}",
-                            "Für das kommende Halbjahr werden wir den eingeschlagenen Entwicklungsweg mit {name} kontinuierlich fortsetzen.",
+                            "",
                             1,
                             "Zusammenfassend ergibt sich eine Durchschnittsnote von {avg_grade} und damit ein insgesamt {avg_text}er Leistungsstand.",
                             "top",
@@ -1465,8 +1471,6 @@ def create_app() -> Flask:
                 return redirect(url_for("letter_templates_editor", template_id=selected_id))
             if not header_html:
                 header_html = "Lernbrief für {name}<br>Lerngruppe: {group_name}<br>Halbjahr: {semester}"
-            if not footer_html:
-                footer_html = "Für das kommende Halbjahr werden wir den eingeschlagenen Entwicklungsweg mit {name} kontinuierlich fortsetzen."
             if not average_sentence_template:
                 average_sentence_template = (
                     "Zusammenfassend ergibt sich eine Durchschnittsnote von {avg_grade} "
