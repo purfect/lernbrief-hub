@@ -16,6 +16,7 @@ dist/
 *.db
 *.sqlite
 *.sqlite3
+lernbrief_hub.db
 
 # OS / editor
 .DS_Store
