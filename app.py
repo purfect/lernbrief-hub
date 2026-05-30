@@ -134,6 +134,13 @@ def ensure_sentence_punctuation(text: str) -> str:
     return cleaned
 
 
+def plain_text_to_html(text: str) -> str:
+    normalized = (text or "").replace("\r\n", "\n").replace("\r", "\n").strip()
+    if not normalized:
+        return ""
+    return escape(normalized).replace("\n", "<br>")
+
+
 def html_to_plain_text(raw_html: str) -> str:
     text = raw_html or ""
     text = re.sub(r"(?i)<\s*br\s*/?>", "\n", text)
@@ -859,7 +866,7 @@ def create_app() -> Flask:
         ).fetchone()
         semester_intro = ""
         if intro_row is not None:
-            semester_intro = " ".join(part.strip() for part in intro_row["intro_text"].splitlines() if part.strip())
+            semester_intro = str(intro_row["intro_text"] or "").strip()
 
         goals_row = db.execute(
             """
@@ -871,7 +878,7 @@ def create_app() -> Flask:
         ).fetchone()
         semester_goals = ""
         if goals_row is not None:
-            semester_goals = " ".join(part.strip() for part in goals_row["goal_text"].splitlines() if part.strip())
+            semester_goals = str(goals_row["goal_text"] or "").strip()
 
         tpl = get_active_letter_template()
         format_values = {
@@ -896,7 +903,7 @@ def create_app() -> Flask:
 
         intro_html = ""
         if semester_intro:
-            intro_html = ensure_sentence_punctuation(semester_intro)
+            intro_html = plain_text_to_html(ensure_sentence_punctuation(semester_intro))
 
         body_paragraphs_html: list[str] = []
         for idx, row in enumerate(ratings, start=1):
@@ -916,12 +923,12 @@ def create_app() -> Flask:
                 template = f"In {row['competency_name']} liegt die Leistung bei der Note {row['grade']}."
             sentence = template.replace("{name}", student["full_name"])
             if row["note"]:
-                sentence = f"{sentence} Hinweis: {row['note']}"
+                sentence = f"{sentence}\nHinweis: {row['note']}"
 
-            # Normalize multi-line template blocks into readable report paragraphs.
-            paragraph = " ".join(part.strip() for part in sentence.splitlines() if part.strip())
-            paragraph = ensure_sentence_punctuation(paragraph)
-            body_paragraphs_html.append(paragraph)
+            paragraph = ensure_sentence_punctuation(sentence)
+            paragraph_html = plain_text_to_html(paragraph)
+            if paragraph_html:
+                body_paragraphs_html.append(paragraph_html)
 
             # Add a small paragraph break every two competency blocks.
             if idx % 2 == 0 and idx < len(ratings):
@@ -930,7 +937,9 @@ def create_app() -> Flask:
         footer_parts: list[str] = []
         if int(tpl["include_average_sentence"]) == 1:
             average_sentence = safe_format_text(tpl["average_sentence_template"], format_values)
-            footer_parts.append(ensure_sentence_punctuation(average_sentence))
+            average_html = plain_text_to_html(ensure_sentence_punctuation(average_sentence))
+            if average_html:
+                footer_parts.append(average_html)
 
         custom_footer = normalize_inline_template_html(
             render_html_template(tpl["footer_html"], format_values)
@@ -939,7 +948,8 @@ def create_app() -> Flask:
             footer_parts.append(custom_footer)
 
         if semester_goals:
-            footer_parts.append(f"Halbjahresziele:<br>{ensure_sentence_punctuation(semester_goals)}")
+            goals_html = plain_text_to_html(semester_goals)
+            footer_parts.append(f"Halbjahresziele:<br>{goals_html}")
 
         header_position = tpl["header_position"] if tpl["header_position"] in {"top", "after_intro"} else "top"
         footer_position = tpl["footer_position"] if tpl["footer_position"] in {"bottom", "after_header"} else "bottom"
