@@ -32,7 +32,7 @@ else:
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = DATA_DIR / "lernbrief_hub.db"
 
-GRADE_OPTIONS = [1, 2, 3, 4, 5, 6]
+GRADE_OPTIONS = [1, 2, 3, 4, 5]
 SEMESTER_PATTERN = re.compile(r"^(\d{4})/(\d{4})-(HJ[12])$")
 
 

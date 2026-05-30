@@ -99,7 +99,7 @@
 - Lerngruppenverwaltung mit Uebersicht und direktem Zugriff auf Schuelerlisten.
 - Schuelersuche nach Name oder Lerngruppe auf der Startseite.
 - Kompetenzverwaltung inklusive Bearbeitung von Name, Beschreibung und Sortierreihenfolge.
-- Bewertungsmaske pro Schueler, Kompetenz und Halbjahr (Noten 1 bis 6) mit optionalen Hinweisen.
+- Bewertungsmaske pro Schueler, Kompetenz und Halbjahr (Noten 1 bis 5) mit optionalen Hinweisen.
 - Halbjahreslogik mit standardisiertem Schuljahresformat (YYYY/YYYY-HJ1 oder HJ2).
 - Bearbeitbare Satzbausteine pro Kompetenz und Note mit Mehrfachvarianten.
 - Platzhalterunterstuetzung mit {name} in Satzbausteinen.

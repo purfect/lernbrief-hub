@@ -6,7 +6,7 @@ Lernbrief-Hub ist eine lokale Windows-Software (Web-App), um Lerngruppen, Schül
 
 - Lerngruppen mit Schülerlisten verwalten
 - Globale Kompetenzen (für alle Schüler gleiche Vorgaben)
-- Bewertung pro Schüler und Kompetenz je Halbjahr (Noten 1 bis 6)
+- Bewertung pro Schüler und Kompetenz je Halbjahr (Noten 1 bis 5)
 - Mehrere bearbeitbare Satzbausteine je Kompetenz und Note
 - Eigene Lernbriefvorlagen mit Tabs: anlegen, speichern, aktiv setzen, löschen
 - Header und Footer als Rich-Text pro Vorlage bearbeitbar
