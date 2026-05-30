@@ -1,5 +1,18 @@
 # Release Notes
 
+## Lernbrief-Hub v1.3.0 (30.05.2026)
+
+### Seit v1.2.5 neu
+- Der bisher fest im Code hinterlegte Einleitungssatz wurde in den Header der Lernbriefvorlagen integriert.
+- Der Einleitungssatz ist damit pro Vorlage direkt bearbeitbar und nicht mehr statisch vorgegeben.
+- Bestehende Vorlagen werden automatisch erweitert, damit der Einleitungssatz im Header-Editor erscheint.
+- Die Platzhalterhilfe in den Lernbriefvorlagen wurde vervollstaendigt.
+- Neu dokumentierte Platzhalter in der Hilfe: {full_name}, {avg_grade}, {avg_text}.
+
+### Kompatibilitaet
+- Keine manuelle Migration erforderlich.
+- Vorhandene Vorlagen bleiben erhalten und werden bei Bedarf automatisch aktualisiert.
+
 ## Lernbrief-Hub v1.2.5 (30.05.2026)
 
 ### Seit v1.2.0 neu

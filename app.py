@@ -596,7 +596,7 @@ def create_app() -> Flask:
             "INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)",
             (
                 "letter_header_template",
-                "Lernbrief für {name}\nLerngruppe: {group_name}\nHalbjahr: {semester}",
+                "Lernbrief für {name}\nLerngruppe: {group_name}\nHalbjahr: {semester}\n\n{full_name} hat im aktuellen Halbjahr in den vereinbarten Kompetenzbereichen insgesamt {avg_text}e Leistungen gezeigt.\n\nIm Einzelnen zeigt sich folgende Entwicklung:",
             ),
         )
         db.execute(
@@ -645,6 +645,31 @@ def create_app() -> Flask:
                     16,
                 ),
             )
+
+        # Migration: Make the lead-in sentence editable in the header for existing templates.
+        default_header_lead = (
+            "{full_name} hat im aktuellen Halbjahr in den vereinbarten Kompetenzbereichen "
+            "insgesamt {avg_text}e Leistungen gezeigt.<br><br>Im Einzelnen zeigt sich folgende Entwicklung:"
+        )
+        existing_templates = db.execute(
+            "SELECT id, header_html FROM letter_templates ORDER BY id ASC"
+        ).fetchall()
+        for tpl_row in existing_templates:
+            current_header = (tpl_row["header_html"] or "").strip()
+            if "vereinbarten Kompetenzbereichen" in current_header:
+                continue
+            if current_header:
+                updated_header = f"{current_header}<br><br>{default_header_lead}"
+            else:
+                updated_header = (
+                    "Lernbrief für {name}<br>Lerngruppe: {group_name}<br>Halbjahr: {semester}<br><br>"
+                    f"{default_header_lead}"
+                )
+            db.execute(
+                "UPDATE letter_templates SET header_html = ? WHERE id = ?",
+                (updated_header, tpl_row["id"]),
+            )
+
         db.execute("UPDATE letter_templates SET is_active = 0 WHERE id NOT IN (SELECT id FROM letter_templates WHERE is_active = 1)")
         active_count = db.execute("SELECT COUNT(*) AS c FROM letter_templates WHERE is_active = 1").fetchone()["c"]
         if active_count == 0:
@@ -852,18 +877,16 @@ def create_app() -> Flask:
             render_html_template(tpl["header_html"], format_values)
         )
         if not header_html.strip():
-            fallback = "Lernbrief für {name}<br>Lerngruppe: {group_name}<br>Halbjahr: {semester}"
+            fallback = (
+                "Lernbrief für {name}<br>Lerngruppe: {group_name}<br>Halbjahr: {semester}<br><br>"
+                "{full_name} hat im aktuellen Halbjahr in den vereinbarten Kompetenzbereichen insgesamt {avg_text}e Leistungen gezeigt.<br><br>"
+                "Im Einzelnen zeigt sich folgende Entwicklung:"
+            )
             header_html = normalize_inline_template_html(render_html_template(fallback, format_values))
 
         intro_html = ""
         if semester_intro:
             intro_html = ensure_sentence_punctuation(semester_intro)
-
-        lead_html = (
-            f"{student['full_name']} hat im aktuellen Halbjahr in den vereinbarten Kompetenzbereichen "
-            f"insgesamt {avg_text}e Leistungen gezeigt."
-            "<br><br>Im Einzelnen zeigt sich folgende Entwicklung:"
-        )
 
         body_paragraphs_html: list[str] = []
         for idx, row in enumerate(ratings, start=1):
@@ -933,9 +956,6 @@ def create_app() -> Flask:
 
         if header_position == "after_intro" and header_html:
             html_parts.append(f"<div class='letter-header'>{header_html}</div>")
-
-        if lead_html.strip():
-            html_parts.append(f"<p>{lead_html}</p>")
 
         body_clean = [p for p in body_paragraphs_html if p.strip()]
         for paragraph in body_clean:
